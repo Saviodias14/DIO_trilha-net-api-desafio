@@ -5,8 +5,13 @@ using TrilhaApiDesafio.Context;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<OrganizadorContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoPadrao")));
+var conectionString = builder.Configuration.GetConnectionString("ConexaoPadrao");
+builder.Services.AddDbContext<OrganizadorContext>(opts =>
+opts.UseLazyLoadingProxies().UseNpgsql(conectionString, npgsqlOptions =>
+    {
+        npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+    })
+);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
